@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strings"
+)
+
 type Weapon struct {
 	ID         int                `json:"id"`
 	Slug       string             `json:"slug"`
@@ -17,14 +21,141 @@ type Weapon struct {
 	Attributes WeaponAttributes   `json:"attributes"`
 }
 
-const WeaponsDataEndpoint Endpoint = "weapons"
+const WeaponsEndpoint Endpoint = "weapons"
+
+var allWeaponsData []Weapon
 
 func fetchAllWeaponsData() ([]Weapon, error) {
-	return fetchData[[]Weapon](WeaponsDataEndpoint)
+	if len(allWeaponsData) != 0 {
+		return allWeaponsData, nil
+	}
+
+	data, err := fetchData[[]Weapon](WeaponsEndpoint)
+	if err != nil {
+		return []Weapon{}, err
+	}
+
+	allWeaponsData = data
+
+	return data, nil
 }
 
-const WeaponDataByIDEndpoint Endpoint = "weapons/"
+func fetchWeaponsByQuery(query string) ([]Weapon, error) {
+	// TODO
+	return []Weapon{}, nil
+}
 
-func fetchAllWeaponByIDData(id string) (Weapon, error) {
-	return fetchData[Weapon](WeaponDataByIDEndpoint + Endpoint(id))
+func fetchWeaponsByName(name string) ([]Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return []Weapon{}, err
+	}
+
+	var filtered []Weapon
+	tree := generateRadixTree(name)
+	for _, weapon := range allWeapons {
+		if tree.search(strings.ToLower(weapon.Name)) {
+			filtered = append(filtered, weapon)
+		}
+	}
+
+	return filtered, nil
+}
+
+func fetchWeaponsBySlug(slug string) ([]Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return []Weapon{}, err
+	}
+
+	var filtered []Weapon
+	tree := generateRadixTree(slug)
+	for _, weapon := range allWeapons {
+		if tree.search(strings.ToLower(weapon.Slug)) {
+			filtered = append(filtered, weapon)
+		}
+	}
+
+	return filtered, nil
+}
+
+func fetchWeaponsByType(t WeaponType) ([]Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return []Weapon{}, err
+	}
+
+	var filtered []Weapon
+	tree := generateRadixTree(string(t))
+	for _, weapon := range allWeapons {
+		if tree.search(strings.ToLower(string(weapon.Type))) {
+			filtered = append(filtered, weapon)
+		}
+	}
+
+	return filtered, nil
+}
+
+func fetchWeaponsByDamageType(t DamageType) ([]Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return []Weapon{}, err
+	}
+
+	var filtered []Weapon
+	tree := generateRadixTree(string(t))
+	for _, weapon := range allWeapons {
+		if tree.search(strings.ToLower(string(weapon.DamageType))) {
+			filtered = append(filtered, weapon)
+		}
+	}
+
+	return filtered, nil
+}
+
+func fetchWeaponsByEldersealType(t EldersealType) ([]Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return []Weapon{}, err
+	}
+
+	var filtered []Weapon
+	tree := generateRadixTree(string(t))
+	for _, weapon := range allWeapons {
+		if tree.search(strings.ToLower(string(weapon.Elderseal))) {
+			filtered = append(filtered, weapon)
+		}
+	}
+
+	return filtered, nil
+}
+
+func fetchWeaponByID(id int) (Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return Weapon{}, err
+	}
+
+	for _, weapon := range allWeapons {
+		if weapon.ID == id {
+			return weapon, nil
+		}
+	}
+
+	return Weapon{}, nil
+}
+
+func fetchWeaponByRarity(rarity int) (Weapon, error) {
+	allWeapons, err := fetchAllWeaponsData()
+	if err != nil {
+		return Weapon{}, err
+	}
+
+	for _, weapon := range allWeapons {
+		if weapon.Rarity == rarity {
+			return weapon, nil
+		}
+	}
+
+	return Weapon{}, nil
 }

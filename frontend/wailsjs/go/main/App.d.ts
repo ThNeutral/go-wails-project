@@ -4,4 +4,6 @@ import {main} from '../models';
 
 export function GetAllWeapons():Promise<Array<main.Weapon>>;
 
-export function GetWeaponByID(arg1:string):Promise<main.Weapon>;
+export function GetWeaponByID(arg1:number):Promise<main.Weapon>;
+
+export function GetWeaponsByName(arg1:string):Promise<Array<main.Weapon>>;

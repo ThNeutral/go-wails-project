@@ -2,6 +2,6 @@ package main
 
 const (
 	WINDOW_TITLE  = "mhw"
-	WINDOW_WIDTH  = 1024
+	WINDOW_WIDTH  = 1268
 	WINDOW_HEIGHT = 768
 )

@@ -14,22 +14,6 @@ export namespace main {
 	        this.raw = source["raw"];
 	    }
 	}
-	export class Constants {
-	    WindowTitle: string;
-	    WindowWidth: number;
-	    WindowHeight: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new Constants(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.WindowTitle = source["WindowTitle"];
-	        this.WindowWidth = source["WindowWidth"];
-	        this.WindowHeight = source["WindowHeight"];
-	    }
-	}
 	export class Item {
 	    id: number;
 	    name: string;

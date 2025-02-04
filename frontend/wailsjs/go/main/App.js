@@ -9,3 +9,7 @@ export function GetAllWeapons() {
 export function GetWeaponByID(arg1) {
   return window['go']['main']['App']['GetWeaponByID'](arg1);
 }
+
+export function GetWeaponsByName(arg1) {
+  return window['go']['main']['App']['GetWeaponsByName'](arg1);
+}

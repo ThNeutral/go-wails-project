@@ -32,13 +32,24 @@ func (a *App) GetAllWeapons() []Weapon {
 	return weapons
 }
 
-func (a *App) GetWeaponByID(id string) Weapon {
-	weapon, err := fetchAllWeaponByIDData(id)
+func (a *App) GetWeaponByID(id int) (Weapon, error) {
+	weapon, err := fetchWeaponByID(id)
 
 	if err != nil {
 		fmt.Println(err)
-		return Weapon{}
+		return Weapon{}, err
 	}
 
-	return weapon
+	return weapon, nil
+}
+
+func (a *App) GetWeaponsByQuery(query string) ([]Weapon, error) {
+	weapons, err := fetchWeaponsByQuery(query)
+
+	if err != nil {
+		fmt.Println(err)
+		return []Weapon{}, err
+	}
+
+	return weapons, nil
 }
