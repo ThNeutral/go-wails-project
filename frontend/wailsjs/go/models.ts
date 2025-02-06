@@ -71,18 +71,6 @@ export namespace main {
 		}
 	}
 	
-	export class Slot {
-	    rank: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new Slot(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.rank = source["rank"];
-	    }
-	}
 	export class WeaponAttributes {
 	    affinity: number;
 	    defense: number;
@@ -189,6 +177,18 @@ export namespace main {
 	        this.hidden = source["hidden"];
 	    }
 	}
+	export class Slot {
+	    rank: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Slot(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.rank = source["rank"];
+	    }
+	}
 	export class Weapon {
 	    id: number;
 	    slug: string;
@@ -245,6 +245,40 @@ export namespace main {
 		    return a;
 		}
 	}
+	export class PayloadWeaponArray {
+	    Data: Weapon[];
+	    Error: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new PayloadWeaponArray(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Data = this.convertValues(source["Data"], Weapon);
+	        this.Error = source["Error"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
 	
 	
 	

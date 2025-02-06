@@ -8,7 +8,7 @@
 
 <div class="container">
   {#if error}
-    <div>{error.message}</div>
+    <div>{error}</div>
   {:else if isLoading}
     <Circle color={Colors.NEUTRAL}/>
   {:else}

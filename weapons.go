@@ -1,6 +1,9 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -32,130 +35,64 @@ func fetchAllWeaponsData() ([]Weapon, error) {
 
 	data, err := fetchData[[]Weapon](WeaponsEndpoint)
 	if err != nil {
-		return []Weapon{}, err
+		return nil, err
 	}
 
 	allWeaponsData = data
-
 	return data, nil
 }
 
 func fetchWeaponsByQuery(query string) ([]Weapon, error) {
-	// TODO
-	return []Weapon{}, nil
+	if len(query) == 0 || query[0] != '$' {
+		_, err := strconv.Atoi(query)
+		if err != nil {
+			return fetchWeaponsByField("name", query)
+		}
+		return fetchWeaponsByField("id", query)
+	}
+
+	query = query[1:]
+	parts := strings.Split(query, ":")
+	if len(parts) != 2 {
+		return nil, errors.New("invalid query $" + query)
+	}
+
+	fmt.Println(parts[0] + "\t" + parts[1])
+
+	return fetchWeaponsByField(parts[0], parts[1])
 }
 
-func fetchWeaponsByName(name string) ([]Weapon, error) {
+func fetchWeaponsByField(field, value string) ([]Weapon, error) {
 	allWeapons, err := fetchAllWeaponsData()
 	if err != nil {
-		return []Weapon{}, err
+		return nil, err
 	}
 
 	var filtered []Weapon
-	tree := generateRadixTree(name)
-	for _, weapon := range allWeapons {
-		if tree.search(strings.ToLower(weapon.Name)) {
-			filtered = append(filtered, weapon)
+	switch strings.ToLower(field) {
+	case "name":
+		filtered = filter(allWeapons, func(w Weapon) bool { return searchSubstring(w.Name, value) })
+	case "id":
+		i, err := strconv.Atoi(value)
+		if err != nil {
+			return nil, errors.New("expected integer in ID query, encountered " + value)
 		}
+		filtered = filter(allWeapons, func(w Weapon) bool { return w.ID == i })
+	case "slug":
+		filtered = filter(allWeapons, func(w Weapon) bool { return searchSubstring(w.Slug, value) })
+	case "type":
+		filtered = filter(allWeapons, func(w Weapon) bool { return searchSubstring(string(w.Type), value) })
+	case "damagetype":
+		filtered = filter(allWeapons, func(w Weapon) bool { return searchSubstring(string(w.DamageType), value) })
+	case "eldersealtype":
+		filtered = filter(allWeapons, func(w Weapon) bool { return searchSubstring(string(w.Elderseal), value) })
+	case "rarity":
+		i, err := strconv.Atoi(value)
+		if err != nil {
+			return nil, errors.New("expected integer in rarity query, encountered " + value)
+		}
+		filtered = filter(allWeapons, func(w Weapon) bool { return w.Rarity == i })
 	}
 
 	return filtered, nil
-}
-
-func fetchWeaponsBySlug(slug string) ([]Weapon, error) {
-	allWeapons, err := fetchAllWeaponsData()
-	if err != nil {
-		return []Weapon{}, err
-	}
-
-	var filtered []Weapon
-	tree := generateRadixTree(slug)
-	for _, weapon := range allWeapons {
-		if tree.search(strings.ToLower(weapon.Slug)) {
-			filtered = append(filtered, weapon)
-		}
-	}
-
-	return filtered, nil
-}
-
-func fetchWeaponsByType(t WeaponType) ([]Weapon, error) {
-	allWeapons, err := fetchAllWeaponsData()
-	if err != nil {
-		return []Weapon{}, err
-	}
-
-	var filtered []Weapon
-	tree := generateRadixTree(string(t))
-	for _, weapon := range allWeapons {
-		if tree.search(strings.ToLower(string(weapon.Type))) {
-			filtered = append(filtered, weapon)
-		}
-	}
-
-	return filtered, nil
-}
-
-func fetchWeaponsByDamageType(t DamageType) ([]Weapon, error) {
-	allWeapons, err := fetchAllWeaponsData()
-	if err != nil {
-		return []Weapon{}, err
-	}
-
-	var filtered []Weapon
-	tree := generateRadixTree(string(t))
-	for _, weapon := range allWeapons {
-		if tree.search(strings.ToLower(string(weapon.DamageType))) {
-			filtered = append(filtered, weapon)
-		}
-	}
-
-	return filtered, nil
-}
-
-func fetchWeaponsByEldersealType(t EldersealType) ([]Weapon, error) {
-	allWeapons, err := fetchAllWeaponsData()
-	if err != nil {
-		return []Weapon{}, err
-	}
-
-	var filtered []Weapon
-	tree := generateRadixTree(string(t))
-	for _, weapon := range allWeapons {
-		if tree.search(strings.ToLower(string(weapon.Elderseal))) {
-			filtered = append(filtered, weapon)
-		}
-	}
-
-	return filtered, nil
-}
-
-func fetchWeaponByID(id int) (Weapon, error) {
-	allWeapons, err := fetchAllWeaponsData()
-	if err != nil {
-		return Weapon{}, err
-	}
-
-	for _, weapon := range allWeapons {
-		if weapon.ID == id {
-			return weapon, nil
-		}
-	}
-
-	return Weapon{}, nil
-}
-
-func fetchWeaponByRarity(rarity int) (Weapon, error) {
-	allWeapons, err := fetchAllWeaponsData()
-	if err != nil {
-		return Weapon{}, err
-	}
-
-	for _, weapon := range allWeapons {
-		if weapon.Rarity == rarity {
-			return weapon, nil
-		}
-	}
-
-	return Weapon{}, nil
 }

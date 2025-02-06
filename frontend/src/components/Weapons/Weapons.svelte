@@ -1,26 +1,29 @@
 <script lang="ts">
-  import { GetWeaponsByName } from "../../../wailsjs/go/main/App";
-  import { GetAllWeapons, GetWeaponByID } from "../../../wailsjs/go/main/App";
+  import { GetAllWeapons, GetWeaponsByQuery } from "../../../wailsjs/go/main/App";
   import { main } from "../../../wailsjs/go/models";
   import WeaponsMap from "./WeaponsMap.svelte";
   import { debounce } from "../../helpers/Utils";
+  import Tooltip from "../Tooltip/Tooltip.svelte";
 
   let weapons: main.Weapon[] = $state([])
   let isLoading = $state(true)
-  let error = $state<Error>()
+  let error = $state("")
 
   let query: string = $state("")
   async function fetchByNameOrID() {
     try {
-      if (query === "") {
-        weapons = await GetAllWeapons()
-      } else if (!Number.isNaN(+query)) {
-        weapons = [await GetWeaponByID(+query)]
+      const { Data, Error } = await GetWeaponsByQuery(query)
+      if (Error && Error.Error) {
+        error = Error.Error;
       } else {
-        weapons = await GetWeaponsByName(query)
+        weapons = Data;
       }
     } catch(e) {
-      error = e as Error
+      if (e instanceof Error) {
+        error = e.message;
+      } else {
+        error = "Unknown error happened"
+      }
     } finally {
       isLoading = false
     }
@@ -30,18 +33,29 @@
     timeout: 500, 
     before: () => {
       isLoading = true
-      error = undefined
+      error = ""
     }
   })
 
   fetchByNameOrID()
 </script>
 
+<!-- {#snippet triggerContent({ mouseOver })}
+  <p>Hover Me</p> -->
+<!-- {/snippet} -->
+
 <div class="container">
   <h1>Weapons List</h1>
-  <input bind:value={query} onkeyup={debouncedFetch} placeholder="Enter name or ID"/>
-  <WeaponsMap isLoading={isLoading} items={weapons}/>
+  <div>
+    <input class="input" bind:value={query} onkeyup={debouncedFetch} placeholder="Enter name or ID"/>
+    <!-- <Tooltip triggerContent={triggerContent} /> -->
+  </div>
+  <WeaponsMap isLoading={isLoading} items={weapons} error={error}/>
 </div>
 
 <style>
+  .input {
+    width: 180px;
+    padding: 5px 20px;
+  }
 </style>

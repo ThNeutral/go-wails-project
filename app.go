@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 )
+
+type PayloadWeaponArray struct {
+	Data  []Weapon
+	Error error
+}
 
 // App struct
 type App struct {
@@ -21,35 +25,26 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) GetAllWeapons() []Weapon {
+func (a *App) GetAllWeapons() PayloadWeaponArray {
 	weapons, err := fetchAllWeaponsData()
-
-	if err != nil {
-		fmt.Println(err)
-		return []Weapon{}
+	return PayloadWeaponArray{
+		Data:  weapons,
+		Error: err,
 	}
-
-	return weapons
 }
 
-func (a *App) GetWeaponByID(id int) (Weapon, error) {
-	weapon, err := fetchWeaponByID(id)
+func (a *App) GetWeaponsByQuery(query string) PayloadWeaponArray {
+	var weapons []Weapon
+	var err error
 
-	if err != nil {
-		fmt.Println(err)
-		return Weapon{}, err
+	if query == "" {
+		weapons, err = fetchAllWeaponsData()
+	} else {
+		weapons, err = fetchWeaponsByQuery(query)
 	}
 
-	return weapon, nil
-}
-
-func (a *App) GetWeaponsByQuery(query string) ([]Weapon, error) {
-	weapons, err := fetchWeaponsByQuery(query)
-
-	if err != nil {
-		fmt.Println(err)
-		return []Weapon{}, err
+	return PayloadWeaponArray{
+		Data:  weapons,
+		Error: err,
 	}
-
-	return weapons, nil
 }
