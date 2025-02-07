@@ -2,8 +2,13 @@
   import Circle from "svelte-loading-spinners/Circle.svelte";
   import { Colors } from "../../helpers/Constants";
   import type { WeaponsMapProps } from "./types";
+  import { getContext } from "svelte";
+  import { NAV_BAR_CONTEXT_NAME, WEAPON_CARD_ROUTE_NAME } from "../NavBar/consts";
+  import type { NavBarContext } from "../NavBar/types";
 
   let { isLoading, items, error }: WeaponsMapProps = $props()
+
+  let { selectedRoute, setSelectedRoute } = getContext<NavBarContext>(NAV_BAR_CONTEXT_NAME);
 </script>
 
 <div class="container">
@@ -14,10 +19,10 @@
   {:else}
     <div class="items">
       {#each items as item}
-        <div class="item">
+        <button type="button" class="item" onclick={() => setSelectedRoute(WEAPON_CARD_ROUTE_NAME + item.id)}>
           <img class="image" src={item.assets.image} alt={"weapon image"}/>
           <div>{item.name}</div>
-        </div>
+        </button>
       {/each}
     </div>
   {/if}
@@ -33,12 +38,14 @@
   }
 
   .container .items {
+    cursor: pointer;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
   }
 
   .container .items .item {
+    all: unset;
     display: flex;
     flex-direction: column;
     width: 125px;

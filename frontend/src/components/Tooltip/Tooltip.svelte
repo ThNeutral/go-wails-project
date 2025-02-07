@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { TooltipProps } from "./types";
+  import type { TooltipProps } from "./types";
 
-	let { tooltipContent: TooltipContent, triggerContent: TriggerContent }: TooltipProps = $props();
+	let { content, children }: TooltipProps = $props();
 	let isHovered = $state(false);
 	let x = $state(0);
 	let y = $state(0);
@@ -20,11 +20,19 @@
 	}
 </script>
 
-{@render TooltipContent({ mouseOver })}
+<div
+	role="tooltip"
+	onmouseover={mouseOver}
+	onfocus={() => {}}
+	onmousemove={mouseMove}
+	onmouseleave={mouseLeave}
+>
+	{@render children?.()}
+</div>
 
 {#if isHovered}
 	<div style="top: {y}px; left: {x}px;" class="tooltip">
-        <TooltipContent />
+        {@render content()}
     </div>
 {/if}
 

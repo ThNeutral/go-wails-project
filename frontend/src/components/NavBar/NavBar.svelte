@@ -1,24 +1,39 @@
 <script lang="ts">
-  import type { NavBarProps } from "./types";
+  import { setContext } from "svelte";
+  import type { NavBarProps, NavBarContext } from "./types";
+  import { NAV_BAR_CONTEXT_NAME } from "./consts";
 
-  let { routes }: NavBarProps = $props()
-  let selectedIndex = $state(0)
-  const SelectedComponent = $derived(routes[selectedIndex].component)
+  let { routes, defaultRouteName = routes[0].name }: NavBarProps = $props()
+  let context = $state<NavBarContext>({
+    selectedRoute: defaultRouteName,
+    setSelectedRoute: (newRoute: string) => (context.selectedRoute = newRoute)
+  })
+  let SelectedComponent = $state(routes.find(route => context.selectedRoute.includes(route.name))?.component);
+
+  $effect(() => {
+    SelectedComponent = routes.find(route => context.selectedRoute.includes(route.name))?.component;
+  });
+
+  setContext(NAV_BAR_CONTEXT_NAME, context)
 </script>
 
 <div class="container">
   <div class="top">
-    {#each routes as route, index}
-      <button 
-        class={`button ${selectedIndex === index ? "active" : ""}`} 
-        onclick={() => selectedIndex = index}
-      >
-        {route.name}
-      </button>
+    {#each routes as route}
+      {#if route.hasButton}
+        <button 
+          class={`button ${context.selectedRoute === route.name ? "active" : ""}`} 
+          onclick={() => context.setSelectedRoute(route.name)}
+        >
+          {route.name}
+        </button>
+      {/if}
     {/each}
   </div>
   <div class="bottom">
-    <SelectedComponent />
+    {#if SelectedComponent !== undefined}
+      <SelectedComponent />
+    {/if}
   </div>
 </div>
 

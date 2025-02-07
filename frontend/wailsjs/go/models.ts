@@ -71,6 +71,20 @@ export namespace main {
 		}
 	}
 	
+	export class RequestQuery {
+	    Field: string;
+	    Query: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RequestQuery(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Field = source["Field"];
+	        this.Query = source["Query"];
+	    }
+	}
 	export class WeaponAttributes {
 	    affinity: number;
 	    defense: number;
@@ -125,7 +139,7 @@ export namespace main {
 	}
 	export class WeaponCraftingInfo {
 	    craftable: boolean;
-	    previous: number;
+	    previous: string;
 	    branches: number[];
 	    craftingMaterials: CraftingCost[];
 	    upgradeMaterials: CraftingCost[];
@@ -245,12 +259,12 @@ export namespace main {
 		    return a;
 		}
 	}
-	export class PayloadWeaponArray {
+	export class ResponseWeaponArray {
 	    Data: Weapon[];
 	    Error: any;
 	
 	    static createFrom(source: any = {}) {
-	        return new PayloadWeaponArray(source);
+	        return new ResponseWeaponArray(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -277,6 +291,75 @@ export namespace main {
 		    return a;
 		}
 	}
+	export class WeaponTreeNode {
+	    prev?: WeaponTreeNode;
+	    next: WeaponTreeNode[];
+	    id: number;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new WeaponTreeNode(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.prev = this.convertValues(source["prev"], WeaponTreeNode);
+	        this.next = this.convertValues(source["next"], WeaponTreeNode);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ResponseWeaponTree {
+	    Data?: WeaponTreeNode;
+	    Error: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new ResponseWeaponTree(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Data = this.convertValues(source["Data"], WeaponTreeNode);
+	        this.Error = source["Error"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	
 	
 	

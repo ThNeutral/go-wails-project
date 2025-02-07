@@ -1,6 +1,6 @@
-import type { Snippet } from "svelte";
+import type { Component, Snippet } from "svelte";
 
 export interface TooltipProps {
-    triggerContent: Snippet<[{mouseOver: (e: MouseEvent) => void}]>
-    tooltipContent: Snippet
+    children?: Snippet
+    content: Snippet
 }

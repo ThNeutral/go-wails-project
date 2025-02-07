@@ -1,6 +1,25 @@
 package main
 
+import "encoding/json"
+
 type WeaponType string
+
+type Weapon struct {
+	ID         int                `json:"id"`
+	Slug       string             `json:"slug"`
+	Name       string             `json:"name"`
+	Type       WeaponType         `json:"type"`
+	Rarity     int                `json:"rarity"`
+	Attack     Attack             `json:"attack"`
+	Slots      []Slot             `json:"slots"`
+	Elements   []WeaponElement    `json:"elements"`
+	Crafting   WeaponCraftingInfo `json:"crafting"`
+	Assets     WeaponAssets       `json:"assets"`
+	Durability []WeaponSharpness  `json:"durability"`
+	Elderseal  EldersealType      `json:"elderseal"`
+	DamageType DamageType         `json:"damageType"`
+	Attributes WeaponAttributes   `json:"attributes"`
+}
 
 const (
 	GreatSword     WeaponType = "great-sword"
@@ -32,7 +51,7 @@ type WeaponElement struct {
 
 type WeaponCraftingInfo struct {
 	Craftable         bool           `json:"craftable"`
-	Previous          int            `json:"previous"`
+	Previous          json.Number    `json:"previous"`
 	Branches          []int          `json:"branches"`
 	CraftingMaterials []CraftingCost `json:"craftingMaterials"`
 	UpgradeMaterials  []CraftingCost `json:"upgradeMaterials"`

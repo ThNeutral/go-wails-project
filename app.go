@@ -4,9 +4,19 @@ import (
 	"context"
 )
 
-type PayloadWeaponArray struct {
+type ResponseWeaponArray struct {
 	Data  []Weapon
 	Error error
+}
+
+type ResponseWeaponTree struct {
+	Data  *WeaponTreeNode
+	Error error
+}
+
+type RequestQuery struct {
+	Field string
+	Query string
 }
 
 // App struct
@@ -25,26 +35,26 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) GetAllWeapons() PayloadWeaponArray {
+func (a *App) GetAllWeapons() ResponseWeaponArray {
 	weapons, err := fetchAllWeaponsData()
-	return PayloadWeaponArray{
+	return ResponseWeaponArray{
 		Data:  weapons,
 		Error: err,
 	}
 }
 
-func (a *App) GetWeaponsByQuery(query string) PayloadWeaponArray {
-	var weapons []Weapon
-	var err error
-
-	if query == "" {
-		weapons, err = fetchAllWeaponsData()
-	} else {
-		weapons, err = fetchWeaponsByQuery(query)
-	}
-
-	return PayloadWeaponArray{
+func (a *App) GetWeaponsByQuery(query RequestQuery) ResponseWeaponArray {
+	weapons, err := fetchWeaponsByQuery(query)
+	return ResponseWeaponArray{
 		Data:  weapons,
+		Error: err,
+	}
+}
+
+func (a *App) GetWeaponTree(ID int) ResponseWeaponTree {
+	tree, err := generateWeaponTree(ID)
+	return ResponseWeaponTree{
+		Data:  tree,
 		Error: err,
 	}
 }

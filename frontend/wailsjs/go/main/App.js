@@ -6,6 +6,10 @@ export function GetAllWeapons() {
   return window['go']['main']['App']['GetAllWeapons']();
 }
 
+export function GetWeaponTree(arg1) {
+  return window['go']['main']['App']['GetWeaponTree'](arg1);
+}
+
 export function GetWeaponsByQuery(arg1) {
   return window['go']['main']['App']['GetWeaponsByQuery'](arg1);
 }

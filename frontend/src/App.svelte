@@ -1,15 +1,6 @@
-<script>
-  import Home from "./components/Home/Home.svelte";
+<script lang="ts">
+  import { APP_ROUTES, WEAPONS_LIST_ROUTE_NAME } from "./components/NavBar/consts";
   import NavBar from "./components/NavBar/NavBar.svelte";
-  import Weapons from "./components/Weapons/Weapons.svelte";
-  
-  const routes = [
-    {
-      name: "Weapons",
-      component: Weapons
-    }
-  ]
-
 </script>
 
-<NavBar routes={routes} />
+<NavBar routes={APP_ROUTES} defaultRouteName={WEAPONS_LIST_ROUTE_NAME} />
